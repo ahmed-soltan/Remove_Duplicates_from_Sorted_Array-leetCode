@@ -835,7 +835,7 @@ function findDuplicate(nums: number[]): number {
     numsMap.set(num, count);
   }
 
-  return 1
+  return 1;
 }
 
 function rotate(nums: number[], k: number): void {
@@ -914,7 +914,7 @@ function longestConsecutive(nums: number[]): number {
 }
 
 function URLify(url: string): string {
-  return url.trim().replaceAll(" " , "%20");
+  return url.trim().replaceAll(" ", "%20");
 }
 
 console.log(URLify("Mr John Smith "));
@@ -2391,3 +2391,85 @@ function removeOccurrences(s: string, part: string): string {
 
   return str;
 }
+
+function isPermutation(s1: string, s2: string): boolean {
+  if (s1.length !== s2.length) return false;
+
+  const strSet = new Set(s1);
+
+  for (const char of s2) {
+    if (!strSet.has(char)) return false;
+  }
+
+  return true;
+}
+
+function isPalindromePermutation(str: string): boolean {
+  const countMap = new Map();
+  str = str.toLocaleLowerCase().replaceAll(" ", "");
+
+  for (let char of str) {
+    countMap.set(char, (countMap.get(char) || 0) + 1);
+  }
+
+  let oddCount = 0;
+
+  const strArr = Array.from(countMap.values());
+
+  for (const count of strArr) {
+    if (count % 2 !== 0) oddCount++;
+    if (oddCount > 1) return false;
+  }
+
+  return true;
+}
+
+function OneAway(s1: string, s2: string): boolean {
+  let len1 = s1.length,
+    len2 = s2.length;
+
+  if (Math.abs(len1 - len2) > 1) return false;
+  let edits = 0,
+    i = 0,
+    j = 0;
+
+  while (i < len1 && j < len2) {
+    if (s1[i] !== s2[j]) {
+      edits++;
+      if (edits > 1) return false;
+
+      if (len1 > len2) i++;
+      else if (len1 < len2) j++;
+      else i++;
+      j++;
+    } else {
+      i++;
+      j++;
+    }
+  }
+
+  return true;
+}
+
+function compressString(str: string): string {
+  let s = "";
+
+  let left = 0;
+  let right = 1;
+
+  while (right <= str.length) {
+    let count = 1;
+    s += str[left];
+    while (str[right] === str[left]) {
+      count++;
+      right++;
+    }
+
+    s += count;
+    left = right;
+    right++;
+  }
+
+  return s.length < str.length ? s : str;
+}
+

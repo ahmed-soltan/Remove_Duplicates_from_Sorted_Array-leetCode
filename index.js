@@ -721,6 +721,7 @@ function findDuplicate(nums) {
             return num;
         numsMap.set(num, count);
     }
+    return 1;
 }
 function rotate(nums, k) {
     var rest = nums.length - k;
@@ -1991,4 +1992,75 @@ function removeOccurrences(s, part) {
         }
     }
     return str;
+}
+function isPermutation(s1, s2) {
+    if (s1.length !== s2.length)
+        return false;
+    var strSet = new Set(s1);
+    for (var _i = 0, s2_1 = s2; _i < s2_1.length; _i++) {
+        var char = s2_1[_i];
+        if (!strSet.has(char))
+            return false;
+    }
+    return true;
+}
+function isPalindromePermutation(str) {
+    var countMap = new Map();
+    str = str.toLocaleLowerCase().replaceAll(" ", "");
+    for (var _i = 0, str_3 = str; _i < str_3.length; _i++) {
+        var char = str_3[_i];
+        countMap.set(char, (countMap.get(char) || 0) + 1);
+    }
+    var oddCount = 0;
+    var strArr = Array.from(countMap.values());
+    for (var _a = 0, strArr_1 = strArr; _a < strArr_1.length; _a++) {
+        var count = strArr_1[_a];
+        if (count % 2 !== 0)
+            oddCount++;
+        if (oddCount > 1)
+            return false;
+    }
+    return true;
+}
+function OneAway(s1, s2) {
+    var len1 = s1.length, len2 = s2.length;
+    if (Math.abs(len1 - len2) > 1)
+        return false;
+    var edits = 0, i = 0, j = 0;
+    while (i < len1 && j < len2) {
+        if (s1[i] !== s2[j]) {
+            edits++;
+            if (edits > 1)
+                return false;
+            if (len1 > len2)
+                i++;
+            else if (len1 < len2)
+                j++;
+            else
+                i++;
+            j++;
+        }
+        else {
+            i++;
+            j++;
+        }
+    }
+    return true;
+}
+function compressString(str) {
+    var s = "";
+    var left = 0;
+    var right = 1;
+    while (right <= str.length) {
+        var count = 1;
+        s += str[left];
+        while (str[right] === str[left]) {
+            count++;
+            right++;
+        }
+        s += count;
+        left = right;
+        right++;
+    }
+    return s.length < str.length ? s : str;
 }
