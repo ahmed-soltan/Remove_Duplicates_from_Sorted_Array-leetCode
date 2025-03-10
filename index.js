@@ -139,6 +139,12 @@ var LinkedList = /** @class */ (function () {
         }
         this.length--;
     };
+    LinkedList.prototype.display = function () {
+        var temp = this.head;
+        while (temp) {
+            temp = temp.next;
+        }
+    };
     LinkedList.prototype.unshift = function (value) {
         var newNode = new NodeL(value);
         newNode.next = this.head;
@@ -196,15 +202,34 @@ var LinkedList = /** @class */ (function () {
         temp.next = newNode;
         this.length++;
     };
+    LinkedList.prototype.removeDuplicates = function () {
+        var _a, _b;
+        var prev = this.head;
+        var current = this.head;
+        while (prev) {
+            while (current && current.next) {
+                if (((_a = current.next) === null || _a === void 0 ? void 0 : _a.data) === prev.data) {
+                    if (current.next && current.next.next) {
+                        current.next = (_b = current.next) === null || _b === void 0 ? void 0 : _b.next;
+                    }
+                    else {
+                        current.next = null;
+                        break;
+                    }
+                }
+                current = current.next;
+            }
+            prev = prev.next;
+        }
+        this.display();
+    };
     return LinkedList;
 }());
 var list = new LinkedList();
-list.push(1);
 list.push(2);
 list.push(3);
 list.push(1);
 list.push(4);
-console.log(list.length);
 var NodeD = /** @class */ (function () {
     function NodeD(value) {
         this.next = null;
@@ -266,15 +291,46 @@ var Stack = /** @class */ (function () {
     function Stack() {
         this.top = null;
         this.length = 0;
+        this.minValue = Number.MAX_SAFE_INTEGER;
+        // isValidParentheses(str: string) {
+        //   const brackets = {
+        //     "(": ")",
+        //     "[": "]",
+        //     "{": "}",
+        //   };
+        //   for (const char of str) {
+        //     if (brackets[char]) {
+        //       this.push(char);
+        //     } else {
+        //       let top = this.pop();
+        //       if (!top || brackets[top] !== char) {
+        //         return false;
+        //       }
+        //     }
+        //   }
+        //   return this.length === 0;
+        // }
+        // reverseString(str: string) {
+        //   const arr: string[] = [];
+        //   for (const char of str) {
+        //     this.push(char);
+        //   }
+        //   while (this.length > 0) {
+        //     arr.push(this.pop());
+        //   }
+        //   return arr.join("");
+        // }
     }
     Stack.prototype.push = function (value) {
         var newNode = new NodeL(value);
         if (!this.top) {
             this.top = newNode;
+            this.minValue = value;
         }
         else {
             newNode.next = this.top;
             this.top = newNode;
+            this.minValue = Math.min(this.minValue, value);
         }
         this.length++;
     };
@@ -286,39 +342,15 @@ var Stack = /** @class */ (function () {
         this.length--;
         return temp.data;
     };
-    Stack.prototype.isValidParentheses = function (str) {
-        var brackets = {
-            "(": ")",
-            "[": "]",
-            "{": "}",
-        };
-        for (var _i = 0, str_1 = str; _i < str_1.length; _i++) {
-            var char = str_1[_i];
-            if (brackets[char]) {
-                this.push(char);
-            }
-            else {
-                var top_1 = this.pop();
-                if (!top_1 || brackets[top_1] !== char) {
-                    return false;
-                }
-            }
-        }
-        return this.length === 0;
-    };
-    Stack.prototype.reverseString = function (str) {
-        var arr = [];
-        for (var _i = 0, str_2 = str; _i < str_2.length; _i++) {
-            var char = str_2[_i];
-            this.push(char);
-        }
-        while (this.length > 0) {
-            arr.push(this.pop());
-        }
-        return arr.join("");
+    Stack.prototype.min = function () {
+        console.log(this.minValue);
     };
     return Stack;
 }());
+var stack = new Stack();
+stack.push(1);
+stack.push(2);
+stack.push(4);
 var Queue = /** @class */ (function () {
     function Queue() {
         this.front = null;
@@ -739,13 +771,11 @@ function rotate(nums, k) {
     }
     nums.length = 0;
     nums.push.apply(nums, __spreadArray(__spreadArray([], slicedArray, false), reminderArray, false));
-    console.log(nums);
 }
 function subarraySum(nums, k) {
     var count = 0;
     var sumMap = new Map();
     sumMap.set(0, 1);
-    console.log(sumMap);
     for (var i = 0; i < nums.length; i++) {
         if (nums[i] === k) {
             count++;
@@ -789,7 +819,6 @@ function longestConsecutive(nums) {
 function URLify(url) {
     return url.trim().replaceAll(" ", "%20");
 }
-console.log(URLify("Mr John Smith "));
 function sortedSquares(nums) {
     var left = 0, right = nums.length - 1;
     var result = [];
@@ -2014,8 +2043,8 @@ function isPermutation(s1, s2) {
 function isPalindromePermutation(str) {
     var countMap = new Map();
     str = str.toLocaleLowerCase().replaceAll(" ", "");
-    for (var _i = 0, str_3 = str; _i < str_3.length; _i++) {
-        var char = str_3[_i];
+    for (var _i = 0, str_1 = str; _i < str_1.length; _i++) {
+        var char = str_1[_i];
         countMap.set(char, (countMap.get(char) || 0) + 1);
     }
     var oddCount = 0;
@@ -2071,3 +2100,371 @@ function compressString(str) {
     }
     return s.length < str.length ? s : str;
 }
+function frogJump(n, heights) {
+    if (n === 1)
+        return 0; // If there's only one step, no energy is needed.
+    var prev1 = 0; // dp[i-1]
+    var prev2 = 0; // dp[i-2] (starting at 0 for first step)
+    for (var i = 1; i < n; i++) {
+        var jumpOne = prev1 + Math.abs(heights[i] - heights[i - 1]);
+        var jumpTwo = i > 1 ? prev2 + Math.abs(heights[i] - heights[i - 2]) : Infinity;
+        var curr = Math.min(jumpOne, jumpTwo); // Take the minimum jump cost
+        prev2 = prev1; // Move forward in DP state
+        prev1 = curr;
+    }
+    return prev1; // The minimum energy required to reach the last step
+}
+function maxScore(nums) {
+    var numsMap = new Map();
+    for (var _i = 0, nums_3 = nums; _i < nums_3.length; _i++) {
+        var num = nums_3[_i];
+        numsMap.set(num, (numsMap.get(num) || 0) + 1);
+    }
+    var maxX = 0;
+    var arr = Array.from(numsMap);
+    var maxScore = Array.from(numsMap.values());
+    var max = Math.max.apply(Math, maxScore);
+    for (var _a = 0, arr_3 = arr; _a < arr_3.length; _a++) {
+        var num = arr_3[_a];
+        if (num[0] === num[1]) {
+            maxX = Math.max(maxX, num[0]);
+        }
+    }
+    return maxX;
+}
+function timeConversion(s) {
+    var isPm = s.includes("PM");
+    s = s.slice(0, s.length - 2);
+    var arr = s.split(":");
+    if (isPm && arr[0] !== "12") {
+        arr[0] = (Number(arr[0]) + 12).toString();
+    }
+    if (!isPm && arr[0] === "12") {
+        arr[0] = "00";
+    }
+    return arr.join(":");
+}
+function findMedian(arr) {
+    arr.sort(function (a, b) { return a - b; });
+    var midIndex = Math.floor(arr.length / 2);
+    return arr[midIndex];
+}
+function getMaxElementIndexes(a, rotate) {
+    var maxIndices = [];
+    var n = a.length;
+    var max = Math.max.apply(Math, a);
+    var maxIndex = a.indexOf(max);
+    for (var i = 0; i < rotate.length; i++) {
+        var k = rotate[i] % n;
+        var newIndex = (maxIndex - k + n) % n;
+        maxIndices.push(newIndex);
+    }
+    return maxIndices;
+}
+function minimumMovement(obstacleLanes) {
+    if (!obstacleLanes.includes(1) || !obstacleLanes.includes(3))
+        return 1;
+    var count = 0;
+    var current = 2;
+    for (var i = 0; i < obstacleLanes.length; i++) {
+        if (current === 2 && current === obstacleLanes[i]) {
+            if (obstacleLanes[i + 1] === 1) {
+                current = 3;
+                count++;
+            }
+            else if (obstacleLanes[i + 1] === 3) {
+                current = 1;
+                count++;
+            }
+            else {
+                if (obstacleLanes[i + 2] === 1) {
+                    current = 3;
+                    count++;
+                }
+                else if (obstacleLanes[i + 2] === 3) {
+                    current = 1;
+                    count++;
+                }
+            }
+        }
+        if (current === 1 && current === obstacleLanes[i]) {
+            if (obstacleLanes[i + 1] === 2) {
+                current = 3;
+                count++;
+            }
+            else if (obstacleLanes[i + 1] === 3) {
+                current = 2;
+                count++;
+            }
+            else {
+                if (obstacleLanes[i + 1] === 2) {
+                    current = 3;
+                    count++;
+                }
+                else if (obstacleLanes[i + 1] === 3) {
+                    current = 2;
+                    count++;
+                }
+            }
+        }
+        if (current === 3 && current === obstacleLanes[i]) {
+            if (obstacleLanes[i + 1] === 1) {
+                current = 2;
+                count++;
+            }
+            else if (obstacleLanes[i + 1] === 2) {
+                current = 1;
+                count++;
+            }
+            else {
+                if (obstacleLanes[i + 1] === 1) {
+                    current = 2;
+                    count++;
+                }
+                else if (obstacleLanes[i + 1] === 2) {
+                    current = 1;
+                    count++;
+                }
+            }
+        }
+    }
+    return count;
+}
+function breadthFirst(graph, point) {
+    var queue = [point];
+    while (queue.length > 0) {
+        var current = queue.shift();
+        console.log(current);
+        for (var _i = 0, _a = graph[current]; _i < _a.length; _i++) {
+            var element = _a[_i];
+            queue.push(element);
+        }
+    }
+}
+function depthFirst(graph, point) {
+    var stack = [point];
+    // while (stack.length > 0) {
+    //   const current = stack.pop();
+    //   console.log(current);
+    //   for (const element of graph[current!]) {
+    //     stack.push(element);
+    //   }
+    // }
+    console.log(point);
+    for (var _i = 0, _a = graph[point]; _i < _a.length; _i++) {
+        var element = _a[_i];
+        depthFirst(graph, element);
+    }
+}
+var graph = {
+    f: ["g", "i"],
+    g: ["h"],
+    h: [],
+    i: ["g", "k"],
+    j: ["i"],
+    k: [],
+};
+var hasPath = function (graph, src, dst) {
+    // ======= Breadth-first-search ==========
+    // const queue = [src];
+    // while (queue.length > 0) {
+    //   const current = queue.shift();
+    //   if (current === dst) {
+    //     return true;
+    //   }
+    //   for (const element of graph[current!]) {
+    //     queue.push(element);
+    //   }
+    // }
+    // ======= Depth-first-search ==========
+    var stack = [src];
+    var hasVisited = new Set();
+    while (stack.length > 0) {
+        var current = stack.pop();
+        if (current === dst) {
+            return true;
+        }
+        for (var _i = 0, _a = graph[current]; _i < _a.length; _i++) {
+            var element = _a[_i];
+            if (!hasVisited.has(element)) {
+                stack.push(element);
+                hasVisited.add(element);
+            }
+        }
+    }
+    return false;
+};
+function floodFill(image, sr, sc, color) {
+    var startColor = image[sr][sc];
+    if (startColor === color)
+        return image;
+    var queue = [[sr, sc]];
+    var directions = [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1],
+    ];
+    image[sr][sc] = color;
+    while (queue.length > 0) {
+        var _a = queue.shift(), src = _a[0], dst = _a[1];
+        for (var _i = 0, directions_7 = directions; _i < directions_7.length; _i++) {
+            var _b = directions_7[_i], dsr = _b[0], dcs = _b[1];
+            var newSrc = dsr + src;
+            var newDst = dcs + dst;
+            if (newSrc >= 0 &&
+                newSrc < image.length &&
+                newDst >= 0 &&
+                newDst < image[0].length &&
+                image[newSrc][newDst] === startColor) {
+                image[newSrc][newDst] = color;
+                queue.push([newSrc, newDst]);
+            }
+        }
+    }
+    return image;
+}
+var undirectedPath = function (edges, nodeA, nodeB) {
+    var graph = {};
+    for (var _i = 0, edges_1 = edges; _i < edges_1.length; _i++) {
+        var element = edges_1[_i];
+        var src = element[0], dst = element[1];
+        if (!(src in graph)) {
+            graph[src] = [];
+        }
+        if (!graph[dst]) {
+            graph[dst] = [];
+        }
+        graph[src].push(dst);
+        graph[dst].push(src);
+    }
+    var stack = [nodeA];
+    var hasVisited = new Set();
+    while (stack.length > 0) {
+        var current = stack.pop();
+        if (current === nodeB) {
+            return true;
+        }
+        for (var _a = 0, _b = graph[current]; _a < _b.length; _a++) {
+            var element = _b[_a];
+            if (!hasVisited.has(element)) {
+                stack.push(element);
+                hasVisited.add(element);
+            }
+        }
+    }
+    return false;
+};
+var connectedComponentsCount = function (graph) {
+    var queue = [];
+    var seen = new Set();
+    var keys = new Set(Object.keys(graph));
+    var count = 0;
+    var maxCount = 0;
+    while (keys.size > 0) {
+        var firstNode = keys.values().next().value; // get an arbitrary unvisited node
+        queue.push(String(firstNode));
+        seen.add(String(firstNode));
+        keys.delete(String(firstNode));
+        count = 0;
+        while (queue.length > 0) {
+            var current = queue.shift();
+            for (var _i = 0, _a = graph[current]; _i < _a.length; _i++) {
+                var neighbor = _a[_i];
+                if (!seen.has(String(neighbor))) {
+                    seen.add(String(neighbor));
+                    queue.push(String(neighbor));
+                    keys.delete(String(neighbor));
+                }
+            }
+            count++;
+        }
+        maxCount = Math.max(maxCount, count);
+    }
+    return maxCount;
+};
+var shortestPath = function (edges, nodeA, nodeB) {
+    var graph = {};
+    for (var _i = 0, edges_2 = edges; _i < edges_2.length; _i++) {
+        var _a = edges_2[_i], n1 = _a[0], n2 = _a[1];
+        if (!(n1 in graph))
+            graph[n1] = [];
+        if (!(n2 in graph))
+            graph[n2] = [];
+        graph[n1].push(n2);
+        graph[n2].push(n1);
+    }
+    var queue = [[nodeA, 0]];
+    var visited = new Set([nodeA]);
+    while (queue.length > 0) {
+        var _b = queue.shift(), current = _b[0], distance = _b[1];
+        if (current === nodeB)
+            return distance;
+        for (var _c = 0, _d = graph[current]; _c < _d.length; _c++) {
+            var neighbor = _d[_c];
+            if (!visited.has(neighbor)) {
+                visited.add(neighbor);
+                queue.push([neighbor, distance + 1]);
+            }
+        }
+    }
+    return -1;
+};
+var edges = [
+    ["w", "x"],
+    ["x", "y"],
+    ["z", "y"],
+    ["z", "v"],
+    ["w", "v"],
+];
+var islandCount = function (grid) {
+    var hasVisited = new Set();
+    var rows = grid.length;
+    var cols = grid[0].length;
+    var count = 0;
+    var directions = [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1],
+    ];
+    var explore = function (row, col, visited) {
+        var queue = [[row, col]];
+        visited.add("".concat(row, ",").concat(col));
+        while (queue.length > 0) {
+            var _a = queue.shift(), r = _a[0], c = _a[1];
+            for (var _i = 0, directions_8 = directions; _i < directions_8.length; _i++) {
+                var _b = directions_8[_i], dr = _b[0], dc = _b[1];
+                var newRow = r + dr;
+                var newCol = c + dc;
+                if (newRow >= 0 &&
+                    newRow < rows &&
+                    newCol >= 0 &&
+                    newCol < cols &&
+                    grid[newRow][newCol] === "L" &&
+                    !visited.has("".concat(newRow, ",").concat(newCol))) {
+                    queue.push([newRow, newCol]);
+                    visited.add("".concat(newRow, ",").concat(newCol));
+                }
+            }
+        }
+    };
+    for (var i = 0; i < rows; i++) {
+        for (var j = 0; j < cols; j++) {
+            if (grid[i][j] === "L" && !hasVisited.has("".concat(i, ",").concat(j))) {
+                explore(i, j, hasVisited);
+                count++;
+            }
+        }
+    }
+    return count;
+};
+var grid = [
+    ["W", "L", "W", "W", "W"],
+    ["W", "L", "W", "W", "W"],
+    ["W", "W", "W", "L", "W"],
+    ["W", "W", "L", "L", "W"],
+    ["L", "W", "W", "L", "L"],
+    ["L", "L", "W", "W", "W"],
+];
+console.log(islandCount(grid)); // -> 3

@@ -161,6 +161,13 @@ class LinkedList {
     this.length--;
   }
 
+  display() {
+    let temp = this.head;
+    while (temp) {
+      temp = temp.next;
+    }
+  }
+
   unshift(value: number) {
     const newNode = new NodeL(value);
     newNode.next = this.head;
@@ -227,18 +234,34 @@ class LinkedList {
     this.length++;
   }
 
-  removeDuplicates:()=>{}
+  removeDuplicates() {
+    let prev: NodeL | null = this.head;
+    let current: NodeL | null = this.head;
+
+    while (prev) {
+      while (current && current.next) {
+        if (current.next?.data === prev.data) {
+          if (current.next && current.next.next) {
+            current.next = current.next?.next;
+          } else {
+            current.next = null;
+            break;
+          }
+        }
+        current = current.next;
+      }
+      prev = prev.next;
+    }
+    this.display();
+  }
 }
 
-const list = new LinkedList()
+const list = new LinkedList();
 
-list.push(1)
-list.push(2)
-list.push(3)
-list.push(1)
-list.push(4)
-
-console.log(list.length)
+list.push(2);
+list.push(3);
+list.push(1);
+list.push(4);
 
 class NodeD {
   data: number;
@@ -307,15 +330,18 @@ class DoublyLinkedList {
 
 class Stack {
   top: NodeL | null = null;
-  length: any = 0;
+  length: number = 0;
+  minValue: number = Number.MAX_SAFE_INTEGER;
 
   push(value: any) {
     const newNode = new NodeL(value);
     if (!this.top) {
       this.top = newNode;
+      this.minValue = value;
     } else {
       newNode.next = this.top;
       this.top = newNode;
+      this.minValue = Math.min(this.minValue, value);
     }
     this.length++;
   }
@@ -328,40 +354,50 @@ class Stack {
     return temp.data;
   }
 
-  isValidParentheses(str: string) {
-    const brackets = {
-      "(": ")",
-      "[": "]",
-      "{": "}",
-    };
-
-    for (const char of str) {
-      if (brackets[char]) {
-        this.push(char);
-      } else {
-        let top = this.pop();
-
-        if (!top || brackets[top] !== char) {
-          return false;
-        }
-      }
-    }
-    return this.length === 0;
+  min() {
+    console.log(this.minValue);
   }
 
-  reverseString(str: string) {
-    const arr: string[] = [];
-    for (const char of str) {
-      this.push(char);
-    }
+  // isValidParentheses(str: string) {
+  //   const brackets = {
+  //     "(": ")",
+  //     "[": "]",
+  //     "{": "}",
+  //   };
 
-    while (this.length > 0) {
-      arr.push(this.pop());
-    }
+  //   for (const char of str) {
+  //     if (brackets[char]) {
+  //       this.push(char);
+  //     } else {
+  //       let top = this.pop();
 
-    return arr.join("");
-  }
+  //       if (!top || brackets[top] !== char) {
+  //         return false;
+  //       }
+  //     }
+  //   }
+  //   return this.length === 0;
+  // }
+
+  // reverseString(str: string) {
+  //   const arr: string[] = [];
+  //   for (const char of str) {
+  //     this.push(char);
+  //   }
+
+  //   while (this.length > 0) {
+  //     arr.push(this.pop());
+  //   }
+
+  //   return arr.join("");
+  // }
 }
+
+const stack = new Stack();
+
+stack.push(1);
+stack.push(2);
+stack.push(4);
 
 class Queue {
   front: NodeL | null = null;
@@ -863,8 +899,6 @@ function rotate(nums: number[], k: number): void {
   nums.length = 0;
 
   nums.push(...slicedArray, ...reminderArray);
-
-  console.log(nums);
 }
 
 function subarraySum(nums: number[], k: number): number {
@@ -873,8 +907,6 @@ function subarraySum(nums: number[], k: number): number {
   let sumMap = new Map<number, number>();
 
   sumMap.set(0, 1);
-
-  console.log(sumMap);
 
   for (let i = 0; i < nums.length; i++) {
     if (nums[i] === k) {
@@ -928,8 +960,6 @@ function longestConsecutive(nums: number[]): number {
 function URLify(url: string): string {
   return url.trim().replaceAll(" ", "%20");
 }
-
-console.log(URLify("Mr John Smith "));
 
 function sortedSquares(nums: number[]): number[] {
   let left = 0,
@@ -2485,3 +2515,432 @@ function compressString(str: string): string {
   return s.length < str.length ? s : str;
 }
 
+function frogJump(n: number, heights: number[]): number {
+  if (n === 1) return 0; // If there's only one step, no energy is needed.
+
+  let prev1 = 0; // dp[i-1]
+  let prev2 = 0; // dp[i-2] (starting at 0 for first step)
+
+  for (let i = 1; i < n; i++) {
+    let jumpOne = prev1 + Math.abs(heights[i] - heights[i - 1]);
+    let jumpTwo =
+      i > 1 ? prev2 + Math.abs(heights[i] - heights[i - 2]) : Infinity;
+
+    let curr = Math.min(jumpOne, jumpTwo); // Take the minimum jump cost
+    prev2 = prev1; // Move forward in DP state
+    prev1 = curr;
+  }
+
+  return prev1; // The minimum energy required to reach the last step
+}
+
+function maxScore(nums: number[]): number {
+  const numsMap = new Map<number, number>();
+
+  for (const num of nums) {
+    numsMap.set(num, (numsMap.get(num) || 0) + 1);
+  }
+
+  let maxX = 0;
+
+  const arr = Array.from(numsMap);
+  const maxScore = Array.from(numsMap.values());
+  const max = Math.max(...maxScore);
+
+  for (const num of arr) {
+    if (num[0] === num[1]) {
+      maxX = Math.max(maxX, num[0]);
+    }
+  }
+
+  return maxX;
+}
+
+function timeConversion(s: string): string {
+  let isPm = s.includes("PM");
+  s = s.slice(0, s.length - 2);
+  const arr = s.split(":");
+
+  if (isPm && arr[0] !== "12") {
+    arr[0] = (Number(arr[0]) + 12).toString();
+  }
+
+  if (!isPm && arr[0] === "12") {
+    arr[0] = "00";
+  }
+
+  return arr.join(":");
+}
+
+function findMedian(arr: number[]): number {
+  arr.sort((a, b) => a - b);
+  let midIndex = Math.floor(arr.length / 2);
+
+  return arr[midIndex];
+}
+
+function getMaxElementIndexes(a: number[], rotate: number[]): number[] {
+  const maxIndices: number[] = [];
+  const n = a.length;
+
+  const max = Math.max(...a);
+  const maxIndex = a.indexOf(max);
+
+  for (let i = 0; i < rotate.length; i++) {
+    let k = rotate[i] % n;
+    let newIndex = (maxIndex - k + n) % n;
+    maxIndices.push(newIndex);
+  }
+
+  return maxIndices;
+}
+
+function minimumMovement(obstacleLanes: number[]): number {
+  if (!obstacleLanes.includes(1) || !obstacleLanes.includes(3)) return 1;
+  let count = 0;
+  let current = 2;
+
+  for (let i = 0; i < obstacleLanes.length; i++) {
+    if (current === 2 && current === obstacleLanes[i]) {
+      if (obstacleLanes[i + 1] === 1) {
+        current = 3;
+        count++;
+      } else if (obstacleLanes[i + 1] === 3) {
+        current = 1;
+        count++;
+      } else {
+        if (obstacleLanes[i + 2] === 1) {
+          current = 3;
+          count++;
+        } else if (obstacleLanes[i + 2] === 3) {
+          current = 1;
+          count++;
+        }
+      }
+    }
+    if (current === 1 && current === obstacleLanes[i]) {
+      if (obstacleLanes[i + 1] === 2) {
+        current = 3;
+        count++;
+      } else if (obstacleLanes[i + 1] === 3) {
+        current = 2;
+        count++;
+      } else {
+        if (obstacleLanes[i + 1] === 2) {
+          current = 3;
+          count++;
+        } else if (obstacleLanes[i + 1] === 3) {
+          current = 2;
+          count++;
+        }
+      }
+    }
+    if (current === 3 && current === obstacleLanes[i]) {
+      if (obstacleLanes[i + 1] === 1) {
+        current = 2;
+        count++;
+      } else if (obstacleLanes[i + 1] === 2) {
+        current = 1;
+        count++;
+      } else {
+        if (obstacleLanes[i + 1] === 1) {
+          current = 2;
+          count++;
+        } else if (obstacleLanes[i + 1] === 2) {
+          current = 1;
+          count++;
+        }
+      }
+    }
+  }
+
+  return count;
+}
+
+function breadthFirst(graph: Graph, point: string) {
+  const queue = [point];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    console.log(current);
+    for (const element of graph[current!]) {
+      queue.push(element);
+    }
+  }
+}
+
+function depthFirst(graph: Graph, point: string) {
+  const stack = [point];
+
+  // while (stack.length > 0) {
+  //   const current = stack.pop();
+  //   console.log(current);
+  //   for (const element of graph[current!]) {
+  //     stack.push(element);
+  //   }
+  // }
+
+  console.log(point);
+  for (const element of graph[point]) {
+    depthFirst(graph, element);
+  }
+}
+
+type Graph = Record<string, string[]>;
+
+const graph = {
+  f: ["g", "i"],
+  g: ["h"],
+  h: [],
+  i: ["g", "k"],
+  j: ["i"],
+  k: [],
+};
+
+const hasPath = (graph: Graph, src: string, dst: string) => {
+  // ======= Breadth-first-search ==========
+  // const queue = [src];
+
+  // while (queue.length > 0) {
+  //   const current = queue.shift();
+
+  //   if (current === dst) {
+  //     return true;
+  //   }
+
+  //   for (const element of graph[current!]) {
+  //     queue.push(element);
+  //   }
+  // }
+
+  // ======= Depth-first-search ==========
+  const stack = [src];
+  const hasVisited = new Set();
+
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    if (current === dst) {
+      return true;
+    }
+
+    for (const element of graph[current!]) {
+      if (!hasVisited.has(element)) {
+        stack.push(element);
+        hasVisited.add(element);
+      }
+    }
+  }
+  return false;
+};
+
+function floodFill(
+  image: number[][],
+  sr: number,
+  sc: number,
+  color: number
+): number[][] {
+  const startColor = image[sr][sc];
+  if (startColor === color) return image;
+
+  const queue = [[sr, sc]];
+
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ];
+
+  image[sr][sc] = color;
+
+  while (queue.length > 0) {
+    const [src, dst] = queue.shift()!;
+
+    for (const [dsr, dcs] of directions) {
+      const newSrc = dsr + src;
+      const newDst = dcs + dst;
+
+      if (
+        newSrc >= 0 &&
+        newSrc < image.length &&
+        newDst >= 0 &&
+        newDst < image[0].length &&
+        image[newSrc][newDst] === startColor
+      ) {
+        image[newSrc][newDst] = color;
+        queue.push([newSrc, newDst]);
+      }
+    }
+  }
+
+  return image;
+}
+
+const undirectedPath = (edges: string[][], nodeA: string, nodeB: string) => {
+  const graph: Graph = {};
+
+  for (const element of edges) {
+    const [src, dst] = element;
+    if (!(src in graph)) {
+      graph[src] = [];
+    }
+    if (!graph[dst]) {
+      graph[dst] = [];
+    }
+    graph[src].push(dst);
+    graph[dst].push(src);
+  }
+
+  const stack = [nodeA];
+  const hasVisited = new Set();
+
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    if (current === nodeB) {
+      return true;
+    }
+
+    for (const element of graph[current!]) {
+      if (!hasVisited.has(element)) {
+        stack.push(element);
+        hasVisited.add(element);
+      }
+    }
+  }
+  return false;
+};
+
+const connectedComponentsCount = (graph) => {
+  const queue: string[] = [];
+  const seen = new Set();
+  const keys = new Set(Object.keys(graph));
+  let count = 0;
+  let maxCount = 0;
+
+  while (keys.size > 0) {
+    const firstNode = keys.values().next().value; // get an arbitrary unvisited node
+    queue.push(String(firstNode));
+    seen.add(String(firstNode));
+    keys.delete(String(firstNode));
+    count = 0;
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+
+      for (const neighbor of graph[current!]) {
+        if (!seen.has(String(neighbor))) {
+          seen.add(String(neighbor));
+          queue.push(String(neighbor));
+          keys.delete(String(neighbor));
+        }
+      }
+      count++;
+    }
+    maxCount = Math.max(maxCount, count);
+  }
+
+  return maxCount;
+};
+
+const shortestPath = (
+  edges: [string, string][],
+  nodeA: string,
+  nodeB: string
+): number => {
+  const graph: Record<string, string[]> = {};
+
+  for (const [n1, n2] of edges) {
+    if (!(n1 in graph)) graph[n1] = [];
+    if (!(n2 in graph)) graph[n2] = [];
+    graph[n1].push(n2);
+    graph[n2].push(n1);
+  }
+
+  const queue: [string, number][] = [[nodeA, 0]];
+  const visited = new Set<string>([nodeA]);
+
+  while (queue.length > 0) {
+    const [current, distance] = queue.shift()!;
+
+    if (current === nodeB) return distance;
+
+    for (const neighbor of graph[current]) {
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor);
+        queue.push([neighbor, distance + 1]);
+      }
+    }
+  }
+
+  return -1;
+};
+
+const edges = [
+  ["w", "x"],
+  ["x", "y"],
+  ["z", "y"],
+  ["z", "v"],
+  ["w", "v"],
+];
+
+const islandCount = (grid) => {
+  const hasVisited = new Set();
+  const rows = grid.length;
+  const cols = grid[0].length;
+  let count = 0;
+
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ];
+
+  const explore = (row, col, visited) => {
+    const queue = [[row, col]];
+    visited.add(`${row},${col}`);
+
+    while (queue.length > 0) {
+      const [r, c] = queue.shift()!;
+
+      for (const [dr, dc] of directions) {
+        const newRow = r + dr;
+        const newCol = c + dc;
+
+        if (
+          newRow >= 0 &&
+          newRow < rows &&
+          newCol >= 0 &&
+          newCol < cols &&
+          grid[newRow][newCol] === "L" &&
+          !visited.has(`${newRow},${newCol}`)
+        ) {
+          queue.push([newRow, newCol]);
+          visited.add(`${newRow},${newCol}`);
+        }
+      }
+    }
+  };
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (grid[i][j] === "L" && !hasVisited.has(`${i},${j}`)) {
+        explore(i, j, hasVisited);
+        count++;
+      }
+    }
+  }
+
+  return count;
+};
+
+const grid = [
+  ["W", "L", "W", "W", "W"],
+  ["W", "L", "W", "W", "W"],
+  ["W", "W", "W", "L", "W"],
+  ["W", "W", "L", "L", "W"],
+  ["L", "W", "W", "L", "L"],
+  ["L", "L", "W", "W", "W"],
+];
+
+console.log(islandCount(grid)) // -> 3
